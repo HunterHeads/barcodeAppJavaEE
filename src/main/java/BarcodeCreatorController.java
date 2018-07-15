@@ -15,20 +15,20 @@ public class BarcodeCreatorController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        String input = request.getParameter("input");
-//        String barcodeType = request.getParameter("barcodeType");
-//
-//        response.setContentType("application/pdf");
-//
-//        InputStream inputStream = barcodeCreatorService.receiveDataFromFormAndReturnPdfFile(barcodeType, input);
-//        IOUtils.copy(inputStream, response.getOutputStream());
-//        response.flushBuffer();
+        String input = request.getParameter("input");
+        String barcodeType = request.getParameter("barcodeType");
+
+        response.setContentType("application/pdf");
+
+        InputStream inputStream = barcodeCreatorService.receiveDataFromFormAndReturnPdfFile(barcodeType, input);
+        IOUtils.copy(inputStream, response.getOutputStream());
+        response.flushBuffer();
 //        return "barcodeCreator";
-        performTask(request, response);
+//        test(request, response);
     }
 
 
-    private void performTask(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+    private void test(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
 
         File pdfFile = new File("C:\\IntelliJ IDEA Community Edition 2018.1.5\\projekty fideltronik\\barcodeAppMavenJavaEE\\test.pdf");
