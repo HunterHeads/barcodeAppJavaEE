@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.Optional;
 
 @WebServlet(urlPatterns = "/submitBarcodeForm")
 public class BarcodeCreatorServlet extends HttpServlet {
@@ -20,11 +21,16 @@ public class BarcodeCreatorServlet extends HttpServlet {
         String input = request.getParameter("input");
         String barcodeType = request.getParameter("barcodeType");
 
-        response.setContentType("application/pdf");
-
         InputStream inputStream = barcodeCreatorService.receiveDataFromFormAndReturnPdfFile(barcodeType, input);
-        IOUtils.copy(inputStream, response.getOutputStream());
-        response.flushBuffer();
+        if(inputStream != null) {
+            response.setContentType("application/pdf");
+            IOUtils.copy(inputStream, response.getOutputStream());
+            response.flushBuffer();
+        }
+        else{
+            request.setAttribute("errorMessage", "Cannot create barcode from this text");
+            request.getRequestDispatcher("/").forward(request, response);
+        }
 //        return "barcodeCreator";
 //        test(request, response);
     }

@@ -20,6 +20,7 @@ body
 
 <div class="container">
     <form method="get" action="${pageContext.request.contextPath}/submitBarcodeForm">
+        <div style="color: #FF0000;">${errorMessage}</div>
         <div class="form-group">
             <h3><b>Text:</b></h3>
             <textarea class="form-control p-3" rows="3" placeholder="Write a text from which the bar code is to be generated, the bar code is generated for every text seperated by comma" name="input" required></textarea>

@@ -5,7 +5,6 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.*;
 import validator.BarcodeValidator;
 
-import javax.jws.WebService;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,7 +14,6 @@ import java.util.List;
 
 public class BarcodeCreatorService {
     private final BarcodeValidator barcodeValidator = new BarcodeValidator();
-
     private PdfWriter pdfWriter;
     private Map<String, String> barcodeValidatorMap;
 
@@ -75,36 +73,35 @@ public class BarcodeCreatorService {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         pdfWriter = PdfWriter.getInstance(document, out);
         document.open();
-        try {
-            List<Image> barcodeImageList = createImageBarcodeList(barcodeTypeFromForm, inputFromForm);
-//            document.add(new Paragraph("Results for Barcode" + barcodeTypeFromForm));
-            int j = 0; // iterator ilosci elementow na stronie
-            for (Image b : barcodeImageList) {
-                if (b != null) {
-                    document.add(b);
-                    document.add(new Paragraph("\n\n\n\n"));
+        List<Image> barcodeImageList = createImageBarcodeList(barcodeTypeFromForm, inputFromForm);
 
-                    if (++j % 4 == 0) {
-                        document.newPage();
-                        j = 0;
+        if(barcodeValidatorMap.isEmpty()){
+                int j = 0; // iterator ilosci elementow na stronie
+                for (Image b : barcodeImageList) {
+                    if (b != null) {
+                        document.add(b);
+                        document.add(new Paragraph("\n\n\n\n"));
+
+                        if (++j % 4 == 0) {
+                            document.newPage();
+                            j = 0;
+                        }
                     }
                 }
-            }
-            if (!barcodeValidatorMap.isEmpty()) {
-                document.newPage();
-                document.add(new Paragraph("Errors:"));
-                for (Map.Entry<String, String> e : barcodeValidatorMap.entrySet()){
-                    document.add(new Paragraph(e.getKey() + " : " + e.getValue()));
-                }
-            }
-
+                document.close();
+                return new ByteArrayInputStream(out.toByteArray());
+        }
+        else {
             document.close();
-            return new ByteArrayInputStream(out.toByteArray());
-        } catch (BadElementException e) {
-            document.close();
-            e.printStackTrace();
             return null;
         }
+//            if (!barcodeValidatorMap.isEmpty()) {
+//                document.newPage();
+//                document.add(new Paragraph("Errors:"));
+//                for (Map.Entry<String, String> e : barcodeValidatorMap.entrySet()){
+//                    document.add(new Paragraph(e.getKey() + " : " + e.getValue()));
+//                }
+//            }
     }
 
     private void clear() {
@@ -120,9 +117,9 @@ public class BarcodeCreatorService {
             clear();    // barcodeList !
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            return inputStream;
         }
+
+        return inputStream;
     }
 
     public InputStream receiveDataFromFormAndReturnPdfFile(String barcodeTypeFromForm, String inputFromForm) {
