@@ -103,9 +103,10 @@ public class BarcodeCreatorService {
         document.open();
 
             List<Image> barcodeImageList = createImageBarcodeList(barcodeTypeFromForm, inputFromForm);
-if(barcodeValidatorMap.isEmpty()){
+            if(barcodeValidatorMap.isEmpty()){
             int j = 0; // iterator ilosci elementow na stronie
             int i = 0; // iterator listy isQRCodeListfor (Image b : barcodeImageList) {
+                for (Image b : barcodeImageList) {
                 if (b != null) {if (isQRCodeList.get(i).isQRCode()){
                         document.add(new Paragraph(isQRCodeList.get(i).getBarcode()));
                     }
