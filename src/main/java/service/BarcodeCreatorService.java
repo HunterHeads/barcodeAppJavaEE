@@ -14,8 +14,33 @@ import java.util.List;
 
 public class BarcodeCreatorService {
     private final BarcodeValidator barcodeValidator = new BarcodeValidator();
+
+    class QRCode{
+        private boolean isQRCode;
+        private String barcode;
+
+        QRCode(boolean isQRCode, String barcode){
+            this.isQRCode = isQRCode;
+            if (isQRCode){
+                this.barcode = barcode;
+            }
+            else{
+                this.barcode = null;
+            }
+        }
+
+        String getBarcode() {
+            return barcode;
+        }
+
+        boolean isQRCode() {
+            return isQRCode;
+        }
+    }
+
     private PdfWriter pdfWriter;
     private Map<String, String> barcodeValidatorMap;
+    private List<QRCode> isQRCodeList;
 
     private Barcode getBarcodeType(String barcodeTypeFromForm) {
         switch (barcodeTypeFromForm) {
@@ -39,6 +64,7 @@ public class BarcodeCreatorService {
         List<Image> barcodeImageList = new LinkedList<>();
         Barcode barcodeType = getBarcodeType(barcodeTypeFromForm);
         PdfContentByte pdfContentByte = pdfWriter.getDirectContent();
+        isQRCodeList = new LinkedList<>();
 
         if (barcodeType == null) {      // QR
             BarcodeQRCode barcodeQRCode;
@@ -46,6 +72,7 @@ public class BarcodeCreatorService {
                 if (barcodeValidator.validateBarcode(s, barcodeType)) {
                     barcodeQRCode = new BarcodeQRCode(s, 170, 170, new HashMap<>());
                     barcodeImageList.add(barcodeQRCode.getImage());
+                    isQRCodeList.add(new QRCode(true, s));
                 } else {
                     barcodeValidatorMap.put(barcodeValidator.getBarcode(), barcodeValidator.getErrorMessage());
                     barcodeImageList.add(null); // nastapil blad
@@ -58,6 +85,7 @@ public class BarcodeCreatorService {
                     Image image = barcodeType.createImageWithBarcode(pdfContentByte, null, null);
                     image.scalePercent(300);
                     barcodeImageList.add(image);
+                    isQRCodeList.add(new QRCode(false, null));
                 } else {
                     barcodeValidatorMap.put(barcodeValidator.getBarcode(), barcodeValidator.getErrorMessage());
                     barcodeImageList.add(null); // nastapil blad
@@ -73,20 +101,23 @@ public class BarcodeCreatorService {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         pdfWriter = PdfWriter.getInstance(document, out);
         document.open();
-        List<Image> barcodeImageList = createImageBarcodeList(barcodeTypeFromForm, inputFromForm);
 
-        if(barcodeValidatorMap.isEmpty()){
-                int j = 0; // iterator ilosci elementow na stronie
-                for (Image b : barcodeImageList) {
-                    if (b != null) {
-                        document.add(b);
-                        document.add(new Paragraph("\n\n\n\n"));
-
-                        if (++j % 4 == 0) {
-                            document.newPage();
-                            j = 0;
-                        }
+            List<Image> barcodeImageList = createImageBarcodeList(barcodeTypeFromForm, inputFromForm);
+if(barcodeValidatorMap.isEmpty()){
+            int j = 0; // iterator ilosci elementow na stronie
+            int i = 0; // iterator listy isQRCodeListfor (Image b : barcodeImageList) {
+                if (b != null) {if (isQRCodeList.get(i).isQRCode()){
+                        document.add(new Paragraph(isQRCodeList.get(i).getBarcode()));
                     }
+                    document.add(b);
+                    document.add(new Paragraph("\n\n\n\n"));
+
+                    if (++j % 4 == 0) {
+                        document.newPage();
+                        j = 0;
+                    }
+                i++;}
+
                 }
                 document.close();
                 return new ByteArrayInputStream(out.toByteArray());
@@ -95,13 +126,6 @@ public class BarcodeCreatorService {
             document.close();
             return null;
         }
-//            if (!barcodeValidatorMap.isEmpty()) {
-//                document.newPage();
-//                document.add(new Paragraph("Errors:"));
-//                for (Map.Entry<String, String> e : barcodeValidatorMap.entrySet()){
-//                    document.add(new Paragraph(e.getKey() + " : " + e.getValue()));
-//                }
-//            }
     }
 
     private void clear() {
