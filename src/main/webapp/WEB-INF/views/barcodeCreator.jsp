@@ -25,13 +25,12 @@ body
             <textarea class="form-control p-3" rows="3" placeholder="Write a text from which the bar code is to be generated, the bar code is generated for every text seperated by comma" name="input" required></textarea>
             <h3 class="pt-3"><b>Type of the barcode: </b></h3>     </p>
             <select class="selectpicker" name="barcodeType">
-                <option value="128">128</option>
+                <option value="128">Code 128</option>
                 <option value="QR">QR</option>
-                <option value="Codabar">Codabar</option>
                 <option value="EAN">EAN</option>
                 <option value="Inter25">Inter25</option>
                 <option value="Postnet">Postnet</option>
-                <option value="39">39</option>
+                <option value="39">Code 39</option>
             </select>
 <br><br>
         <button type="submit" class="btn-lg btn-primary">Generate barcodes</button>
