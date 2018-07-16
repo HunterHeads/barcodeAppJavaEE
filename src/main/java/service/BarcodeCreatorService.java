@@ -1,6 +1,9 @@
+package service;
+
 import com.itextpdf.text.*;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.*;
+import validator.BarcodeValidator;
 
 import javax.jws.WebService;
 import java.io.ByteArrayInputStream;
@@ -22,8 +25,6 @@ public class BarcodeCreatorService {
                 return new Barcode128();
             case "39":
                 return new Barcode39();
-            case "Codabar":
-                return new BarcodeCodabar();
             case "EAN":
                 return new BarcodeEAN();
             case "Inter25":
@@ -127,7 +128,7 @@ public class BarcodeCreatorService {
     public InputStream receiveDataFromFormAndReturnPdfFile(String barcodeTypeFromForm, String inputFromForm) {
         InputStream inputStream;
 
-//        inputFromForm = inputFromForm.replace(" ", "");
+        inputFromForm = inputFromForm.replace(", ", ",");
         String[] inputArray = inputFromForm.split(",");
         inputStream = performToPdfFile(barcodeTypeFromForm, inputArray);
 

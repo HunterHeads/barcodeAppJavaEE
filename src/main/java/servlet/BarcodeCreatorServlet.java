@@ -1,6 +1,8 @@
-import org.apache.commons.io.IOUtils;
+package servlet;
 
-import javax.inject.Inject;
+import org.apache.commons.io.IOUtils;
+import service.BarcodeCreatorService;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -9,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 
 @WebServlet(urlPatterns = "/submitBarcodeForm")
-public class BarcodeCreatorController extends HttpServlet {
+public class BarcodeCreatorServlet extends HttpServlet {
 //    @Inject
     private final BarcodeCreatorService barcodeCreatorService = new BarcodeCreatorService();
 
@@ -51,7 +53,7 @@ public class BarcodeCreatorController extends HttpServlet {
 //    }
 
     //    @Autowired
-//    public BarcodeCreatorController(BarcodeCreatorService barcodeCreatorService) {
+//    public servlet.BarcodeCreatorServlet(service.BarcodeCreatorService barcodeCreatorService) {
 //        this.barcodeCreatorService = barcodeCreatorService;
 //    }
 //

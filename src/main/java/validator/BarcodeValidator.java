@@ -1,3 +1,5 @@
+package validator;
+
 import com.itextpdf.text.pdf.*;
 
 // funkcje sprawdzajace zgodnosc z danym kodem oraz przechowywanie komunikatow o bledach
