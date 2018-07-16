@@ -107,10 +107,11 @@ public class BarcodeCreatorService {
             int j = 0; // iterator ilosci elementow na stronie
             int i = 0; // iterator listy isQRCodeListfor (Image b : barcodeImageList) {
                 for (Image b : barcodeImageList) {
-                if (b != null) {if (isQRCodeList.get(i).isQRCode()){
+                if (b != null) {
+                    document.add(b);
+                    if (isQRCodeList.get(i).isQRCode()){
                         document.add(new Paragraph(isQRCodeList.get(i).getBarcode()));
                     }
-                    document.add(b);
                     document.add(new Paragraph("\n\n\n\n"));
 
                     if (++j % 4 == 0) {
