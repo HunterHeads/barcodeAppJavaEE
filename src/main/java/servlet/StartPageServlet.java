@@ -9,8 +9,6 @@ import java.io.IOException;
 
 @WebServlet(urlPatterns = "/")
 public class StartPageServlet extends HttpServlet {
-//    private final service.BarcodeCreatorService barcodeCreatorService;
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getRequestDispatcher("/WEB-INF/views/barcodeCreator.jsp").forward(req, resp);

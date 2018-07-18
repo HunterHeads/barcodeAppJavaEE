@@ -3,17 +3,20 @@ package service;
 import com.itextpdf.text.*;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.*;
+import org.apache.log4j.Logger;
 import validator.BarcodeValidator;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BarcodeCreatorService {
     private final BarcodeValidator barcodeValidator = new BarcodeValidator();
+//    final static Logger logger = Logger.getLogger(BarcodeCreatorService.class);
+
 
     class QRCode{
         private boolean isQRCode;
@@ -61,6 +64,7 @@ public class BarcodeCreatorService {
 
     // null => w przypadku gdy String nie jest poprawny
     private List<Image> createImageBarcodeList(String barcodeTypeFromForm, String[] inputFromForm) throws BadElementException {
+//        logger.info("Creating barcodes.");
         List<Image> barcodeImageList = new LinkedList<>();
         Barcode barcodeType = getBarcodeType(barcodeTypeFromForm);
         PdfContentByte pdfContentByte = pdfWriter.getDirectContent();
@@ -92,11 +96,11 @@ public class BarcodeCreatorService {
                 }
             }
         }
-
+//        logger.debug("Barcodes are successfully created");
         return barcodeImageList;
     }
 
-    private InputStream createPdfFile(String barcodeTypeFromForm, String[] inputFromForm) throws DocumentException, IOException {
+    private InputStream createPdfFile(String barcodeTypeFromForm, String[] inputFromForm) throws Exception {
         Document document = new Document(PageSize.A4, 100, 100, 36, 36);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         pdfWriter = PdfWriter.getInstance(document, out);
@@ -104,28 +108,35 @@ public class BarcodeCreatorService {
 
             List<Image> barcodeImageList = createImageBarcodeList(barcodeTypeFromForm, inputFromForm);
             if(barcodeValidatorMap.isEmpty()){
-            int j = 0; // iterator ilosci elementow na stronie
-            int i = 0; // iterator listy isQRCodeListfor (Image b : barcodeImageList) {
+                int j = 0; // iterator ilosci elementow na stronie
+                int i = 0; // iterator listy isQRCodeListfor (Image b : barcodeImageList) {
+
                 for (Image b : barcodeImageList) {
-                if (b != null) {if (isQRCodeList.get(i).isQRCode()){
-                        document.add(new Paragraph(isQRCodeList.get(i).getBarcode()));
-                    }
-                    document.add(b);
-                    document.add(new Paragraph("\n\n\n\n"));
+                    if (b != null) {
+                        if(isQRCodeList.get(i).isQRCode()){
+                            document.add(new Paragraph(isQRCodeList.get(i).getBarcode()));
+                        }
+                        document.add(b);
+                        document.add(new Paragraph("\n\n\n\n"));
 
-                    if (++j % 4 == 0) {
-                        document.newPage();
-                        j = 0;
+                        if (++j % 4 == 0) {
+                            document.newPage();
+                            j = 0;
+                        }
+                        i++;
                     }
-                i++;}
-
                 }
                 document.close();
+//                logger.info("Barcodes have been generated to pdf correctly");
                 return new ByteArrayInputStream(out.toByteArray());
-        }
+            }
         else {
-            document.close();
-            return null;
+                String errors = barcodeValidatorMap.entrySet()
+                        .stream()
+                        .map(entry -> entry.getKey() + " - " + entry.getValue())
+                        .collect(Collectors.joining("<br>"));
+//                logger.error("This is error : " + errors);
+            throw new Exception(errors);
         }
     }
 
@@ -133,26 +144,31 @@ public class BarcodeCreatorService {
         barcodeValidatorMap = null;
     }
 
-    private InputStream performToPdfFile(String barcodeTypeFromForm, String[] inputFromForm) {
+    private InputStream performToPdfFile(String barcodeTypeFromForm, String[] inputFromForm) throws Exception {
         InputStream inputStream = null;
-
         try {
             barcodeValidatorMap = new LinkedHashMap<>();
             inputStream = createPdfFile(barcodeTypeFromForm, inputFromForm);
             clear();    // barcodeList !
         } catch (Exception e) {
-            e.printStackTrace();
+//            logger.debug("performToPdfFile:   " + e.getMessage());
+            throw e;
         }
 
         return inputStream;
     }
 
-    public InputStream receiveDataFromFormAndReturnPdfFile(String barcodeTypeFromForm, String inputFromForm) {
+    public InputStream receiveDataFromFormAndReturnPdfFile(String barcodeTypeFromForm, String inputFromForm) throws Exception {
         InputStream inputStream;
 
         inputFromForm = inputFromForm.replace(", ", ",");
         String[] inputArray = inputFromForm.split(",");
-        inputStream = performToPdfFile(barcodeTypeFromForm, inputArray);
+        try {
+            inputStream = performToPdfFile(barcodeTypeFromForm, inputArray);
+        } catch (Exception e) {
+//            logger.debug("receiveDataFromForm:  " + e.getMessage());
+            throw e;
+        }
 
         return inputStream;
     }
