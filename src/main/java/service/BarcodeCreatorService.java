@@ -3,7 +3,7 @@ package service;
 import com.itextpdf.text.*;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.*;
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import validator.BarcodeValidator;
 
 import java.io.ByteArrayInputStream;
